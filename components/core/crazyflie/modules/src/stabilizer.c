@@ -261,8 +261,8 @@ static void stabilizerTask(void* param)
     }
 
     if (testState != testDone) {
-      sensorsAcquire(&sensorData, tick);
-      testProps(&sensorData);
+      sensorsAcquire(&sensorData, tick);//获得传感器数据
+      testProps(&sensorData);//螺旋桨依次转动检查
     } else {
       // allow to update estimator dynamically
       if (getStateEstimator() != estimatorType) {
@@ -275,15 +275,15 @@ static void stabilizerTask(void* param)
         controllerType = getControllerType();
       }
 
-      stateEstimator(&state, &sensorData, &control, tick);
-      compressState();
+      stateEstimator(&state, &sensorData, &control, tick);//状态估计
+      compressState();//转换
 
-      commanderGetSetpoint(&setpoint, &state);
-      compressSetpoint();
+      commanderGetSetpoint(&setpoint, &state);//获取遥感值
+      compressSetpoint();//转换
 
       sitAwUpdateSetpoint(&setpoint, &sensorData, &state);
 
-      controller(&control, &setpoint, &sensorData, &state, tick);
+      controller(&control, &setpoint, &sensorData, &state, tick);//控制算法
 
       checkEmergencyStopTimeout();
 

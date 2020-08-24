@@ -91,7 +91,7 @@ static void positionEstimateInternal(state_t* estimate, const sensorData_t* sens
       // Use zrange as base and add velocity changes.
       state->estimatedZ = filteredZ + (state->velocityFactor * state->velocityZ * dt);
     }
-  } else {
+  } else {//TOF距离传感器无效，使用气压计
     // FIXME: A bit of an hack to init IIR filter
     if (state->estimatedZ == 0.0f) {
       filteredZ = sensorData->baro.asl;
@@ -106,8 +106,8 @@ static void positionEstimateInternal(state_t* estimate, const sensorData_t* sens
 
   estimate->position.x = 0.0f;
   estimate->position.y = 0.0f;
-  estimate->position.z = state->estimatedZ;
-  estimate->velocity.z = (state->estimatedZ - prev_estimatedZ) / dt;
+  estimate->position.z = state->estimatedZ;//估计的z轴位置
+  estimate->velocity.z = (state->estimatedZ - prev_estimatedZ) / dt;//估计的z轴速度
   state->estimatedVZ = estimate->velocity.z;
   prev_estimatedZ = state->estimatedZ;
 }

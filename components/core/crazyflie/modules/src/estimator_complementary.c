@@ -73,10 +73,10 @@ void estimatorComplementary(state_t *state, sensorData_t *sensorData, control_t 
   if (RATE_DO_EXECUTE(ATTITUDE_UPDATE_RATE, tick)) {
     sensfusion6UpdateQ(sensorData->gyro.x, sensorData->gyro.y, sensorData->gyro.z,
                        sensorData->acc.x, sensorData->acc.y, sensorData->acc.z,
-                       ATTITUDE_UPDATE_DT);
+                       ATTITUDE_UPDATE_DT);//四元数更新方程
 
     // Save attitude, adjusted for the legacy CF2 body coordinate system
-    sensfusion6GetEulerRPY(&state->attitude.roll, &state->attitude.pitch, &state->attitude.yaw);
+    sensfusion6GetEulerRPY(&state->attitude.roll, &state->attitude.pitch, &state->attitude.yaw);//通过z-y-x旋转将四元数转换成欧拉角
 
     // Save quaternion, hopefully one day this could be used in a better controller.
     // Note that this is not adjusted for the legacy coordinate system
@@ -90,14 +90,14 @@ void estimatorComplementary(state_t *state, sensorData_t *sensorData, control_t 
                                                     sensorData->acc.y,
                                                     sensorData->acc.z);
 
-    positionUpdateVelocity(state->acc.z, ATTITUDE_UPDATE_DT);
+    positionUpdateVelocity(state->acc.z, ATTITUDE_UPDATE_DT);//速度估计(通过Z轴加速度积分求解速度)
   }
 
   if (RATE_DO_EXECUTE(POS_UPDATE_RATE, tick)) {
     tofMeasurement_t tofMeasurement;
 
     latestTofMeasurement(&tofMeasurement);
-    positionEstimate(state, sensorData, &tofMeasurement, POS_UPDATE_DT, tick);
+    positionEstimate(state, sensorData, &tofMeasurement, POS_UPDATE_DT, tick);//位置估计
   }
 }
 

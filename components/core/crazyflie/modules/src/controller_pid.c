@@ -64,7 +64,7 @@ void controllerPid(control_t *control, setpoint_t *setpoint,
                                          const state_t *state,
                                          const uint32_t tick)
 {
-  if (RATE_DO_EXECUTE(ATTITUDE_RATE, tick)) {
+  if (RATE_DO_EXECUTE(ATTITUDE_RATE, tick)) {//修正方向范围为正负180度
     // Rate-controled YAW is moving YAW angle setpoint
     if (setpoint->mode.yaw == modeVelocity) {
        attitudeDesired.yaw += setpoint->attitudeRate.yaw * ATTITUDE_UPDATE_DT;
@@ -75,23 +75,25 @@ void controllerPid(control_t *control, setpoint_t *setpoint,
     attitudeDesired.yaw = capAngle(attitudeDesired.yaw);
   }
 
-  if (RATE_DO_EXECUTE(POSITION_RATE, tick)) {
-    positionController(&actuatorThrust, &attitudeDesired, setpoint, state);
+  if (RATE_DO_EXECUTE(POSITION_RATE, tick)) {//控制频率200HZ
+    positionController(&actuatorThrust, &attitudeDesired, setpoint, state);//位置控制(内含速度控制)
   }
 
-  if (RATE_DO_EXECUTE(ATTITUDE_RATE, tick)) {
+  if (RATE_DO_EXECUTE(ATTITUDE_RATE, tick)) {//控制频率500HZ
+    velocityController(&actuatorThrust, &attitudeDesired, setpoint, state);//位置环输出量作为速度环输入量
+    
     // Switch between manual and automatic position control
-    if (setpoint->mode.z == modeDisable) {
+    if (setpoint->mode.z == modeDisable) {//手动控制，油门直接由摇杆数据控制
       actuatorThrust = setpoint->thrust;
     }
     if (setpoint->mode.x == modeDisable || setpoint->mode.y == modeDisable) {
       attitudeDesired.roll = setpoint->attitude.roll;
       attitudeDesired.pitch = setpoint->attitude.pitch;
     }
-
-    attitudeControllerCorrectAttitudePID(state->attitude.roll, state->attitude.pitch, state->attitude.yaw,
-                                attitudeDesired.roll, attitudeDesired.pitch, attitudeDesired.yaw,
-                                &rateDesired.roll, &rateDesired.pitch, &rateDesired.yaw);
+  /*角度环*/
+    attitudeControllerCorrectAttitudePID(state->attitude.roll, state->attitude.pitch, state->attitude.yaw,//反馈量
+                                attitudeDesired.roll, attitudeDesired.pitch, attitudeDesired.yaw,//期望量
+                                &rateDesired.roll, &rateDesired.pitch, &rateDesired.yaw);//速度环输出作为角度环输入
 
     // For roll and pitch, if velocity mode, overwrite rateDesired with the setpoint
     // value. Also reset the PID to avoid error buildup, which can lead to unstable
@@ -104,12 +106,12 @@ void controllerPid(control_t *control, setpoint_t *setpoint,
       rateDesired.pitch = setpoint->attitudeRate.pitch;
       attitudeControllerResetPitchAttitudePID();
     }
+  }
+    /*角速度环，//控制频率1000HZ*/
+    attitudeControllerCorrectRatePID(sensors->gyro.x, -sensors->gyro.y, sensors->gyro.z,//期望角速度(陀螺仪输出值)
+                             rateDesired.roll, rateDesired.pitch, rateDesired.yaw);//角度环输出
 
-    // TODO: Investigate possibility to subtract gyro drift.
-    attitudeControllerCorrectRatePID(sensors->gyro.x, -sensors->gyro.y, sensors->gyro.z,
-                             rateDesired.roll, rateDesired.pitch, rateDesired.yaw);
-
-    attitudeControllerGetActuatorOutput(&control->roll,
+    attitudeControllerGetActuatorOutput(&control->roll,//角速度环输出
                                         &control->pitch,
                                         &control->yaw);
 
@@ -123,7 +125,7 @@ void controllerPid(control_t *control, setpoint_t *setpoint,
     r_pitch = -radians(sensors->gyro.y);
     r_yaw = radians(sensors->gyro.z);
     accelz = sensors->acc.z;
-  }
+  
 
   if (tiltCompensationEnabled)
   {

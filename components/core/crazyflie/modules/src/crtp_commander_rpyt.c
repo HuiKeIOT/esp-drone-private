@@ -185,7 +185,7 @@ void crtpCommanderRpytDecodeSetpoint(setpoint_t *setpoint, CRTPPacket *pk)
   }
 
   // roll/pitch
-  if (posHoldMode) {
+  if (posHoldMode) {//定点模式
     setpoint->mode.x = modeVelocity;
     setpoint->mode.y = modeVelocity;
     setpoint->mode.roll = modeDisable;

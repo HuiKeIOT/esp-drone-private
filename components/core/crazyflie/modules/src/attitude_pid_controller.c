@@ -118,6 +118,7 @@ void attitudeControllerCorrectAttitudePID(
        float eulerRollDesired, float eulerPitchDesired, float eulerYawDesired,
        float* rollRateDesired, float* pitchRateDesired, float* yawRateDesired)
 {
+  // Update PID for roll axis
   pidSetDesired(&pidRoll, eulerRollDesired);
   *rollRateDesired = pidUpdate(&pidRoll, eulerRollActual, true);
 

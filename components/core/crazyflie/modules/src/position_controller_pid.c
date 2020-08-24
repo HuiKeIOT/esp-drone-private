@@ -87,18 +87,18 @@ static const float thrustScale = 1000.0f;
 static struct this_s this = {
   .pidVX = {
     .init = {
-      .kp = 25.0f,
+      .kp = 26.0f,//25f
       .ki = 1.0f,
-      .kd = 0.0f,
+      .kd = 0.3f,//0
     },
     .pid.dt = DT,
   },
 
   .pidVY = {
     .init = {
-      .kp = 25.0f,
+      .kp = 26.0f,//25f
       .ki = 1.0f,
-      .kd = 0.0f,
+      .kd = 0.3f,//0
     },
     .pid.dt = DT,
   },
@@ -107,7 +107,7 @@ static struct this_s this = {
     .init = {
       .kp = 22,
       .ki = 15,
-      .kd = 0,
+      .kd = 0.3,//0
     },
     .pid.dt = DT,
   },
@@ -115,7 +115,7 @@ static struct this_s this = {
   .pidX = {
     .init = {
       .kp = 1.9f,
-      .ki = 0.1f,
+      .ki = 0,//0.1f
       .kd = 0,
     },
     .pid.dt = DT,
@@ -124,7 +124,7 @@ static struct this_s this = {
   .pidY = {
     .init = {
       .kp = 1.9f,
-      .ki = 0.1f,
+      .ki = 0,//0.1f
       .kd = 0,
     },
     .pid.dt = DT,
@@ -133,7 +133,7 @@ static struct this_s this = {
   .pidZ = {
     .init = {
       .kp = 1.6f,
-      .ki = 0.5,
+      .ki = 0,
       .kd = 0,
     },
     .pid.dt = DT,
@@ -207,10 +207,10 @@ void positionController(float* thrust, attitude_t *attitude, setpoint_t *setpoin
     setpoint->velocity.y = bodyvy * cosyaw + bodyvx * sinyaw;
   }
   if (setpoint->mode.z == modeAbs) {
-    setpoint->velocity.z = runPid(state->position.z, &this.pidZ, setpoint->position.z, DT);
+    setpoint->velocity.z = runPid(state->position.z, &this.pidZ, setpoint->position.z, DT);//1.6--0--0
   }
 
-  velocityController(thrust, attitude, setpoint, state);
+  //velocityController(thrust, attitude, setpoint, state);//位置环输出量作为速度环输入量
 }
 
 void velocityController(float* thrust, attitude_t *attitude, setpoint_t *setpoint,
@@ -230,15 +230,15 @@ void velocityController(float* thrust, attitude_t *attitude, setpoint_t *setpoin
   attitude->pitch = -(rollRaw  * cosf(yawRad)) - (pitchRaw * sinf(yawRad));
   attitude->roll  = -(pitchRaw * cosf(yawRad)) + (rollRaw  * sinf(yawRad));
 
-  attitude->roll  = constrain(attitude->roll,  -rpLimit, rpLimit);
-  attitude->pitch = constrain(attitude->pitch, -rpLimit, rpLimit);
-
-  // Thrust
-  float thrustRaw = runPid(state->velocity.z, &this.pidVZ, setpoint->velocity.z, DT);
+  attitude->roll  = constrain(attitude->roll,  -rpLimit, rpLimit);//输出限幅
+  attitude->pitch = constrain(attitude->pitch, -rpLimit, rpLimit);//输出限幅
+  
+  // Thrust 高度内环
+  float thrustRaw = runPid(state->velocity.z, &this.pidVZ, setpoint->velocity.z, DT);//22-15-0
   // Scale the thrust and add feed forward term
   *thrust = thrustRaw*thrustScale + this.thrustBase;
   // Check for minimum thrust
-  if (*thrust < this.thrustMin) {
+  if (*thrust < this.thrustMin) {//输出限幅
     *thrust = this.thrustMin;
   }
 }

@@ -1,8 +1,27 @@
-# 气压计MS5611移植与调试
-## 开发笔记
-- 宏定义  
+# ESP-Drone
+## 简介 
+本人有幸参加上海乐鑫组织的线下活动，通过两天的学习与交流逐渐掌握了ESP32-S2的环境搭建、代码编译等工作。同时，也根据自己所学专业知识，修改部分代码，以便和大家交流，欢迎留言。  
+
+ESP-Drone 是基于乐鑫 ESP32-S2/ESP32 开发的小型无人机解决方案，可使用手机 APP 或游戏手柄通过 Wi-Fi 网络进行连接和控制。目前已支持自稳定飞行、定高飞行、定点飞行等多种模式。该方案硬件结构简单，代码架构清晰完善，方便功能扩展，可用于 STEAM 教育等领域。控制系统代码来自 Crazyflie 开源工程，使用 GPL3.0 开源协议。
+
+## 实物图片
+![ESP-Drone](./docs/_static/espdrone_s2_v1_2.png)  
+
+## 官方教程
+* **从这里开始**: [Getting Started](https://docs.espressif.com/projects/espressif-esp-drone/zh_CN/latest/gettingstarted.html)
+* **硬件原理图**：[Hardware](https://docs.espressif.com/projects/espressif-esp-drone/zh_CN/latest/_static/ESP32_S2_Drone_V1_2/SCH_Mainboard_ESP32_S2_Drone_V1_2.pdf)
+* **iOS APP 源代码**: [ESP-Drone-iOS](https://github.com/EspressifApps/ESP-Drone-iOS)
+* **Android APP 源代码**: [ESP-Drone-Android](https://github.com/EspressifApps/ESP-Drone-Android)  
+
+## 开发笔记  
+## 一、 3D建模
+通过Solidworks(2018)绘制，方便3D打印以及导出外形图到AD
+![ESP-Drone](./docs/_static/esp-drone-3d.png)  
+
+## 二、气压计MS5611移植与调试
+- 去除宏定义  
 #define SENSORS_ENABLE_PRESSURE_MS561
-- 修改`i2cdevWriteReg8`函数
+- 修改`i2cdevWriteReg8`函数(**官方已修改**)
 ```
 bool i2cdevWriteReg8(I2C_Dev *dev, uint8_t devAddress, uint8_t memAddress,
                      uint16_t len, uint8_t *data)
@@ -184,4 +203,9 @@ void processBarometerMeasurements(const uint8_t *buffer)
  DEBUG_PRINTI("temperature = %f,pressure = %f\n",temperature,pressure);
 ```  
 作者所处环境温度34.65摄氏度，压力1002.41Pa
-![ESP-Drone](./docs/_static/ms5611.png)
+![ESP-Drone](./docs/_static/ms5611.png)  
+
+## 三、增加相关注释
+## 四、修改控制频率  
+- **controllerPid**函数中，将**attitudeControllerCorrectRatePID**(角速度环)设置为1000HZ，将**attitudeControllerCorrectAttitudePID**(角度环)函数和**velocityController**(速度环)函数设置为500HZ，**positionController**(位置环)设置为200HZ。
+## 五、 修改部分PID
