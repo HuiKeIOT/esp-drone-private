@@ -207,5 +207,8 @@ void processBarometerMeasurements(const uint8_t *buffer)
 
 ## 三、增加相关注释
 ## 四、修改控制频率  
-- **controllerPid**函数中，将**attitudeControllerCorrectRatePID**(角速度环)设置为1000HZ，将**attitudeControllerCorrectAttitudePID**(角度环)函数和**velocityController**(速度环)函数设置为500HZ，**positionController**(位置环)设置为200HZ。
-## 五、 修改部分PID
+- **controllerPid**函数中，将**attitudeControllerCorrectRatePID**(角速度环)设置为1000HZ，将**attitudeControllerCorrectAttitudePID**(角度环)函数和**velocityController**(速度环)函数设置为500HZ，**positionController**(位置环)设置为200HZ。  
+
+## 视频记录  
+[B站](https://www.bilibili.com/video/BV16Z4y1K7jY)  
+欢迎点赞、收藏、投币！
