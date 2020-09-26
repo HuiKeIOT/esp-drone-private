@@ -282,7 +282,7 @@ static void kalmanTask(void* parameters);
 static bool predictStateForward(uint32_t osTick, float dt);
 static bool updateQueuedMeasurments(const Axis3f *gyro, const uint32_t tick);
 
-STATIC_MEM_TASK_ALLOC(kalmanTask, 3 * configMINIMAL_STACK_SIZE);
+STATIC_MEM_TASK_ALLOC(kalmanTask, 3 * configBASE_STACK_SIZE);
 
 // --------------------------------------------------
 

@@ -95,7 +95,7 @@ void pmInit(void)
         return;
     }
 
-    pmEnableExtBatteryVoltMeasuring(35, 2);
+    pmEnableExtBatteryVoltMeasuring(CONFIG_ADC1_PIN, 2);
 
     //TODO:
     pmSyslinkInfo.vBat = 3.7f;

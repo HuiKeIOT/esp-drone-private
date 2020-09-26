@@ -208,7 +208,20 @@ void processBarometerMeasurements(const uint8_t *buffer)
 ## 三、增加相关注释
 ## 四、修改控制频率  
 - **controllerPid**函数中，将**attitudeControllerCorrectRatePID**(角速度环)设置为1000HZ，将**attitudeControllerCorrectAttitudePID**(角度环)函数和**velocityController**(速度环)函数设置为500HZ，**positionController**(位置环)设置为200HZ。  
-
+## 五、编译指令(Linux环境)
+- 进入源文件目录
+- 键入`. $HOME/esp/esp-idf/export.sh`,设置环境变量
+- 键入`idf.py set-target esp32s2`,设置“目标”芯片 
+- 键入`idf.py -p /dev/ttyUSB0 flash monitor`,一次性执行构建、烧录和监视过程(默认USB0)
+- 键入`Ctrl+]`,退出IDF监视器  
+## 六、待解决问题
+* [x]  官方源码启用MS5611后，无法检测，显示`MS5611 I2C connection [FAIL]`
+* [ ] 安装激光以及光流传感器后，静止状态下水平仪飘忽不定
+## 七、与[官方源码](https://github.com/espressif/esp-drone)的同步记录
+* [x] 减少任务堆栈的大小以节省RAM(Aug 19, 2020)
+* [x] 修复`undefined_error_during_link`BUG(Aug 31, 2020)
+* [x] 电池电压测量(Aug 31, 2020)
+* [x] 检测已连接传感器，自动切换对应的状态观测器(Sep 3, 2020)
 ## 视频记录  
 [B站](https://www.bilibili.com/video/BV16Z4y1K7jY)  
 欢迎点赞、收藏、投币！

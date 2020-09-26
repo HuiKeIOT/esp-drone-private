@@ -164,7 +164,7 @@ void systemTask(void *arg)
   commInit();
   commanderInit();
 
-  StateEstimatorType estimator = complementaryEstimator;
+  StateEstimatorType estimator = anyEstimator;
   estimatorKalmanTaskInit();
   //deckInit();
   //estimator = deckGetRequiredEstimator();
